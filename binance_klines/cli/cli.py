@@ -1,5 +1,6 @@
 """cli module"""
 
+import asyncio
 from dataclasses import dataclass
 from binance_klines import BinanceKlineFetcher, KlineDatabase, CryptoPairData
 from binance_klines.utils.config import ConfigObject, format_config
@@ -20,8 +21,7 @@ class BinanceAuth(ConfigObject):
     API_SECRET: str = None
 
 
-def main() -> int:
-    """main entry point"""
+async def _main() -> int:
 
     log.info("Starting...")
     auth = BinanceAuth()
@@ -36,7 +36,7 @@ def main() -> int:
 
     log.info("Fetcher configuration: %s", format_config(fetcher.config_params))
 
-    pair: CryptoPairData = fetcher.fetch_pair()
+    pair: CryptoPairData = await fetcher.fetch_pair()
     if pair is None:
         log.error("Unable to fetch klines for this crypto pair!")
         return EXIT_FAILURE
@@ -47,3 +47,8 @@ def main() -> int:
     log.info("Successfully saved %d klines into database!", len(pair.klines))
 
     return EXIT_SUCCESS
+
+
+def main() -> int:
+    """main entry point"""
+    return asyncio.run(_main())

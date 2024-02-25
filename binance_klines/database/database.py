@@ -49,14 +49,14 @@ class KlineDatabase:
             query = """
             CREATE TABLE IF NOT EXISTS kline_data (
                 open_time INTEGER PRIMARY KEY,
-                close_time INTEGER,
                 open_price REAL,
                 highest_price REAL,
                 lowest_price REAL,
                 close_price REAL,
                 volume REAL,
+                close_time INTEGER,
                 base_asset_volume REAL,
-                number_of_trades INTEGER,
+                trades_count INTEGER,
                 taker_buy_base_asset_volume REAL,
                 taker_buy_quote_asset_volume REAL
             );
@@ -76,28 +76,28 @@ class KlineDatabase:
             query = """
             INSERT INTO kline_data (
                 open_time,
-                close_time,
                 open_price,
                 highest_price,
                 lowest_price,
-                open_price,
+                close_price,
                 volume,
+                close_time,
                 base_asset_volume,
-                number_of_trades,
+                trades_count,
                 taker_buy_base_asset_volume,
                 taker_buy_quote_asset_volume
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
             values = (
                 kline.open_time,
-                kline.close_time,
                 kline.open_price,
                 kline.highest_price,
                 kline.lowest_price,
                 kline.close_price,
                 kline.volume,
+                kline.close_time,
                 kline.base_asset_volume,
-                kline.number_of_trades,
+                kline.trades_count,
                 kline.taker_buy_base_asset_volume,
                 kline.taker_buy_quote_asset_volume,
             )
@@ -122,12 +122,12 @@ class KlineDatabase:
             while row is not None:
                 kline = KlineData(
                     open_time=row[0],
-                    close_time=row[1],
-                    open_price=row[2],
-                    highest_price=row[3],
-                    lowest_price=row[4],
-                    close_price=row[5],
-                    volume=row[6],
+                    open_price=row[1],
+                    highest_price=row[2],
+                    lowest_price=row[3],
+                    close_price=row[4],
+                    volume=row[5],
+                    close_time=row[6],
                     base_asset_volume=row[7],
                     trades_count=row[8],
                     taker_buy_base_asset_volume=row[9],

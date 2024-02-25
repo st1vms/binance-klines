@@ -43,6 +43,7 @@ setup(
     install_requires=[
         "colorlog",
         "asyncio",
+        "dataparser",
         "python-binance",
     ],
 )
