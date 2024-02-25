@@ -38,7 +38,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    entry_points={"console_scripts": ["binance-klines=binance_klines.cli.cli:main"]},
+    entry_points={"console_scripts": ["binance-klines=binance_klines:binance_klines_main"]},
     python_requires=f">={__MIN_PY_VERSION}",
     install_requires=[
         "colorlog",
