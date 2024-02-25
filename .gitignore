@@ -1,7 +1,28 @@
-.vscode
-*test*
-creds
+# Disallow simple tests and allow unit tests based off filename
+# Ignore all 'test*' files in all directories
+**/test*.py
+# But don't ignore them in the 'tests' directory
+!/tests/test*.py
+# Also don't ignore the test_run utility
+!/test_run.py
+
+# Disallow JSON files
+*.json
+
+# Disallow .db files
 *.db
+
+
+# Disallow .ini files
+*.ini
+
+# Disallow VSCode folders/files
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
