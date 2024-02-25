@@ -29,20 +29,26 @@ async def _main() -> int:
     if auth.API_KEY is None or auth.API_SECRET is None:
         raise ValueError("Binance Auth credentials not set!")
 
-    database = KlineDatabase()
-    log.info("Database created at: %s", database.config.FILE_PATH)
-
     fetcher = BinanceKlineFetcher(auth.API_KEY, auth.API_SECRET)
 
     log.info("Fetcher configuration: %s", format_config(fetcher.config_params))
 
     pair: CryptoPairData = await fetcher.fetch_pair()
-    if pair is None:
+    if pair is None or not pair.klines:
         log.error("Unable to fetch klines for this crypto pair!")
         return EXIT_FAILURE
 
-    for kline in pair.klines:
-        database.add_kline(kline)
+    try:
+        database = KlineDatabase()
+    except RuntimeError as e:
+        log.error(e)
+        return EXIT_FAILURE
+
+    log.info("Database created at: %s", database.config.FILE_PATH)
+
+    with database:
+        for kline in pair.klines:
+            database.add_kline(kline)
 
     log.info("Successfully saved %d klines into database!", len(pair.klines))
 

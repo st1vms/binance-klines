@@ -1,6 +1,7 @@
 """Binance Kline fetcher module"""
 
 from time import time
+from datetime import datetime
 from dataclasses import dataclass
 from binance.client import AsyncClient, HistoricalKlinesType
 from binance_klines.database import CryptoPairData, KlineData
@@ -59,7 +60,11 @@ class BinanceKlineFetcher:
                     f"{self.config_params.START_TIME} >= {self.config_params.END_TIME}"
                 )
         start_time = (
-            int(self.config_params.START_TIME if self.config_params.START_TIME else 0)
+            int(
+                self.config_params.START_TIME
+                if self.config_params.START_TIME
+                else time()
+            )
             * 1000
         )
         end_time = (
@@ -67,22 +72,40 @@ class BinanceKlineFetcher:
             * 1000
         )
 
-        log.info(
-            "Getting Historical Spot Klines:\n"
-            "Interval: %s\nStart time: %s\nEnd time: %s",
-            self.config_params.INTERVAL,
-            start_time,
-            end_time,
-        )
 
-        res = await self.client.get_historical_klines(
-            symbol=self.config_params.PAIR_SYMBOL,
-            interval=self.config_params.INTERVAL,
-            start_str=start_time,
-            end_str=end_time,
-            limit=self.config_params.LIMIT,
-            klines_type=kline_type,
-        )
+        if start_time != end_time:
+            log.info(
+                "Getting Historical Spot Klines:\n"
+                "Interval: %s\nStart time: %s (%s)\nEnd time: %s (%s)",
+                self.config_params.INTERVAL,
+                start_time,
+                datetime.fromtimestamp(start_time/1000),
+                end_time,
+                datetime.fromtimestamp(end_time/1000),
+            )
+            res = await self.client.get_historical_klines(
+                symbol=self.config_params.PAIR_SYMBOL,
+                interval=self.config_params.INTERVAL,
+                start_str=start_time,
+                end_str=end_time,
+                limit=self.config_params.LIMIT,
+                klines_type=kline_type,
+            )
+        else:
+            log.info(
+                "Getting Latest Historical Spot Klines:\n"
+                "Interval: %s\n\nEnd time: %s (%s)",
+                self.config_params.INTERVAL,
+                end_time,
+                datetime.fromtimestamp(end_time/1000),
+            )
+            res = await self.client.get_historical_klines(
+                symbol=self.config_params.PAIR_SYMBOL,
+                interval=self.config_params.INTERVAL,
+                end_str=end_time,
+                limit=self.config_params.LIMIT,
+                klines_type=kline_type,
+            )
         klines = []
         for kline in res:
             kline = kline[:-1]
