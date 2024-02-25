@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 
 
-@dataclass(order=True)
+@dataclass
 class KlineData:
     """Kline dataclass"""
 

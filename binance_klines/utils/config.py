@@ -67,3 +67,13 @@ class ConfigObject(ABC):
 
         for k, v in args.items():
             setattr(self, k, v)
+
+
+def format_config(cfg: ConfigObject) -> str:
+    """Format configuration object into string"""
+    fetch_config_str = ""
+    for f in fields(cfg):
+        if f.name in {"section", "config_file_path"}:
+            continue
+        fetch_config_str += f"\n{f.name} = {str(getattr(cfg, f.name))}"
+    return fetch_config_str

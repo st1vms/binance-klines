@@ -42,5 +42,7 @@ setup(
     python_requires=f">={__MIN_PY_VERSION}",
     install_requires=[
         "colorlog",
+        "asyncio",
+        "python-binance",
     ],
 )

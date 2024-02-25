@@ -7,7 +7,7 @@ from binance_klines.utils.config import ConfigObject
 from .klines import KlineData
 
 
-@dataclass(frozen=True)
+@dataclass
 class KlineDatabaseConfig(ConfigObject):
     """Kline Database config object"""
 
@@ -16,13 +16,11 @@ class KlineDatabaseConfig(ConfigObject):
     FILE_PATH: str = "klines.db"
 
 
-CONFIG = KlineDatabaseConfig()
-
-
 class KlineDatabase:
     """Kline Database object"""
 
     def __init__(self) -> None:
+        self.config = KlineDatabaseConfig()
         self.connection = None
         self.create_table()
 
@@ -37,7 +35,7 @@ class KlineDatabase:
 
     def connect(self):
         """Connect to database"""
-        self.connection = db_connect(CONFIG.FILE_PATH)
+        self.connection = db_connect(self.config.FILE_PATH)
 
     def disconnect(self):
         """Disconnect from database"""
@@ -62,8 +60,10 @@ class KlineDatabase:
                 taker_buy_base_asset_volume REAL,
                 taker_buy_quote_asset_volume REAL
             );
-            CREATE INDEX IF NOT EXISTS idx_close_time ON kline_data (close_time);
             """
+            self.connection.execute(query)
+            self.connection.commit()
+            query = """CREATE INDEX IF NOT EXISTS idx_close_time ON kline_data (close_time);"""
             self.connection.execute(query)
             self.connection.commit()
         finally:
@@ -107,7 +107,7 @@ class KlineDatabase:
             self.disconnect()
 
     def iterate_klines(
-        self, filter_func: Callable[[KlineData, Any]] = None
+        self, filter_func: Callable[[KlineData, Any], bool] = None
     ) -> Iterator[KlineData]:
         """Iterate over klines"""
         self.connect()
